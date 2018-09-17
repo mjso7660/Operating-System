@@ -1,0 +1,4 @@
+#include txt files and .exe files
+*.txt
+*.exe
+
