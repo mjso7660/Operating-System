@@ -4,6 +4,22 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+int concat(int fd_in, int fd_out, long buffersize, char* buffer, char* out_file){
+	int bytes_written;
+	int bytes_read = read(fd_in, buffer, buffersize);
+	
+	while(bytes_read > 0){
+		bytes_written = write(fd_out, buffer, bytes_read);
+		if(bytes_written < 0){
+			printf("ERROR");
+		}
+		bytes_read = read(fd_in, buffer, buffersize);
+	}
+	if(bytes_read < 0) printf("ERROR");
+
+
+}
+
 int main(int argc, char **argv){
 	int bflag = 0;
        	int oflag = 0;
@@ -40,12 +56,13 @@ int main(int argc, char **argv){
 	char *buffer = malloc(buffersize);
 
 	printf ("bflag = %d, oflag = %d\n",bflag,oflag);
-	for(index = optind; index < argc; index++)
+	for(index = optind; index < argc; index++){
 		fd_in = open(argv[optind], O_RDONLY);
-		readin = read(fd_in,buffer,buffersize);
-		writeout = write(fd_out,buffer,buffersize);
-		printf("Non-option argument %s\n",argv[index]);
-
+		concat(fd_in, fd_out, buffersize, buffer, argv[optind]);
+	}
+	close(fd_out);
+	free(buffer);
+	return(1);
 }
 
 			
