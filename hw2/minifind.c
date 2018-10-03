@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 	char* location;
 	if(argc > 2)
 	{
-		fprintf(stderr, "ERROR: Only one argument allowed");
+		fprintf(stderr, "ERROR: Only one argument allowed\n");
 		exit(-1);
 	}
 	else if(argc == 1)
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 	{
 		location = argv[1];
 	}else{
-		fprintf(stderr, "ERROR: Unexpected error");
+		fprintf(stderr, "ERROR: Unexpected error\n");
 	}
 	listdir(location);
 }
