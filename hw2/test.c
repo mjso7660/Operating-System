@@ -16,6 +16,7 @@ int is_dot_or_dot_dot(char const* name)
 
 void listdir(char const* dirname)
 {
+	printf("test1\n");
 	char* subdir;
 	DIR* dirp = opendir(dirname);
 	struct dirent *curr_ent;
@@ -28,7 +29,8 @@ void listdir(char const* dirname)
 	}
 
 	while ( (curr_ent = readdir(dirp)) != NULL )
-	{ 
+	{
+		printf("test2\n");
 		// Print the name.
 		lstat(curr_ent->d_name, &buf);
 		char* ftype;
@@ -51,8 +53,7 @@ void listdir(char const* dirname)
 		}else if(S_ISSOCK(code)){
 			 ftype = "s";
 		}
-
-		char mode1[100];
+		char mode1[100] = "";
 		strcat(mode1,S_ISDIR(buf.st_mode) ? "d" : "-");
 		strcat(mode1,buf.st_mode & S_IRUSR ? "r" : "-");
 		strcat(mode1,buf.st_mode & S_IWUSR ? "w" : "-");
@@ -71,8 +72,9 @@ void listdir(char const* dirname)
 		char *ptr;
 		ptr = realpath(symlinkpath, actualpath);
 		sprintf(a,"%s/%s",ptr,curr_ent->d_name);
+		printf("test3\n");
 
-		printf("%lu	%lu	%s	%s	%lu	%d	%d	%lu	%s", curr_ent->d_ino, buf.st_blksize*buf.st_blocks/1000, ftype, *mode1, buf.st_nlink, buf.st_uid, buf.st_gid, buf.st_size, s);
+		printf("%lu	%lu	%s	%s	%lu	%d	%d	%lu	%s", curr_ent->d_ino, buf.st_blksize*buf.st_blocks/1000, ftype, mode1, buf.st_nlink, buf.st_uid, buf.st_gid, buf.st_size, s);
 
 		if(ftype == "l"){
 			printf("	%s -> %s\n",a,*ptr);
@@ -81,12 +83,14 @@ void listdir(char const* dirname)
 		}else{
 			printf("	%s\n",a);
 		}
-
+//		printf("test4\n");
 		// Traverse sub-directories excluding . and ..
 		// Ignore . and ..
+		printf("TESTING %s\n",curr_ent->d_type);
+//		printf("test5\n");
 		if ( curr_ent->d_type == DT_DIR && ! (is_dot_or_dot_dot(curr_ent->d_name)) )
 		{
-	//		printf("%s\n",curr_ent->d_name);
+			printf("not working");
 			// Allocate memory for the subdirectory.
 			// 1 additional for the "/" and the second additional for "\0".
 			subdir = malloc(strlen(dirname) + strlen(curr_ent->d_name) + 2);
