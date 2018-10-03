@@ -29,57 +29,28 @@ void listdir(char const* dirname)
 
 	while ( (curr_ent = readdir(dirp)) != NULL )
 	{ 
-		printf("%s\n",dirname);
-
+		
 		// Print the name.
 		lstat(curr_ent->d_name, &buf);
 		char* ftype;
 		int code = buf.st_mode & S_IFMT;
-		if(S_ISREG(code)){
-			 ftype = "f";
-		}else if(S_ISDIR(code)){
-			 ftype = "d";
-		}else if(S_ISCHR(code)){
-			 ftype = "c";
-		}else if(S_ISBLK(code)){
-			 ftype = "b";
-		}else if(S_ISFIFO(code)){
-			 ftype = "f";
-		}else if(S_ISLNK(code)){
-			 ftype = "sy";
-		}else if(S_ISSOCK(code)){
-			 ftype = "s";
-		}
+
 		char a[100], b[100];
 		char s[1000];
-		time_t t = buf.st_mtime;
-		struct tm *p = localtime(&t);
-		strftime(s, 1000, "%B, %d %Y",p);
-		strcpy(a, dirname);
-		strcpy(b, curr_ent->d_name);
 		char *symlinkpath = strcat(a,b);
 		char actualpath [100];
 		char *ptr;
 		ptr = realpath(symlinkpath, actualpath);
-		printf("PTR: %s\n",symlinkpath);
-
-		printf("%lu	%lu	%s	%07o	%lu	%d	%d	%lu	%s", curr_ent->d_ino, buf.st_blksize*buf.st_blocks/1000, ftype, buf.st_mode, buf.st_nlink, buf.st_uid, buf.st_gid, buf.st_size, s);
-
-		char temp [100];
-		char *ptr2 = realpath("./",temp);
-		if(ftype == "sy"){
-			printf("	%s/%s -> %s\n",ptr2,curr_ent->d_name, ptr);
-		}else if(is_dot_or_dot_dot(curr_ent->d_name)){
-			printf("	%s/%s\n",ptr2,curr_ent->d_name);
-		}else{
-			printf("	%s\n",ptr);
-		}
+		printf("%s\n",symlinkpath);
+		sprintf(s, "%s/%s",dirname,curr_ent->d_name);
+		
+		//char *file = strcat(a,b);
+		printf("%s\n",s);
 
 		// Traverse sub-directories excluding . and ..
 		// Ignore . and ..
 		if ( curr_ent->d_type == DT_DIR && ! (is_dot_or_dot_dot(curr_ent->d_name)) )
 		{
-	//		printf("%s\n",curr_ent->d_name);
 			// Allocate memory for the subdirectory.
 			// 1 additional for the "/" and the second additional for "\0".
 			subdir = malloc(strlen(dirname) + strlen(curr_ent->d_name) + 2);

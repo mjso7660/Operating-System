@@ -1,15 +1,15 @@
-#include <stdlib.h>
+#include <libgen.h>
 #include <string.h>
+#include <dirent.h>
+#include <stdlib.h>
 #include <stdio.h>
-//#include <
-
 
 int main(){
-	int PATH_MAX = 0;
-	char *symlinkpath = "./test.c";
-	char actualpath [PATH_MAX+1];
-	char *ptr;
+	char* local_file = "a.out";
 
-	ptr = realpath(symlinkpath, actualpath);
-	printf("%s\n",ptr);
+	char* ts1 = strdup(local_file);
+	char* ts2 = strdup(local_file);
+
+	char* dir = dirname(ts1);
+	printf("%s\n",dir);
 }
