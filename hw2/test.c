@@ -29,12 +29,13 @@ void listdir(char const* dirname)
 
 	while ( (curr_ent = readdir(dirp)) != NULL )
 	{ 
-		printf("%s\n",dirname);
-
 		// Print the name.
 		lstat(curr_ent->d_name, &buf);
 		char* ftype;
 		int code = buf.st_mode & S_IFMT;
+		char a[100];
+		char s[100];
+
 		if(S_ISREG(code)){
 			 ftype = "f";
 		}else if(S_ISDIR(code)){
@@ -46,33 +47,39 @@ void listdir(char const* dirname)
 		}else if(S_ISFIFO(code)){
 			 ftype = "f";
 		}else if(S_ISLNK(code)){
-			 ftype = "sy";
+			 ftype = "l";
 		}else if(S_ISSOCK(code)){
 			 ftype = "s";
 		}
-		char a[100], b[100];
-		char s[1000];
+
+		char mode1[100];
+		strcat(mode1,S_ISDIR(buf.st_mode) ? "d" : "-");
+		strcat(mode1,buf.st_mode & S_IRUSR ? "r" : "-");
+		strcat(mode1,buf.st_mode & S_IWUSR ? "w" : "-");
+		strcat(mode1,buf.st_mode & S_IXUSR ? "x" : "-");
+		strcat(mode1,buf.st_mode & S_IRGRP ? "r" : "-");
+		strcat(mode1,buf.st_mode & S_IWGRP ? "w" : "-");
+		strcat(mode1,buf.st_mode & S_IXGRP ? "x" : "-");
+		strcat(mode1,buf.st_mode & S_IROTH ? "r" : "-");
+		strcat(mode1,buf.st_mode & S_IWOTH ? "w" : "-");
+		strcat(mode1,buf.st_mode & S_IXOTH ? "x" : "-");
 		time_t t = buf.st_mtime;
 		struct tm *p = localtime(&t);
 		strftime(s, 1000, "%B, %d %Y",p);
-		strcpy(a, dirname);
-		strcpy(b, curr_ent->d_name);
-		char *symlinkpath = strcat(a,b);
+		char const*symlinkpath = dirname;
 		char actualpath [100];
 		char *ptr;
 		ptr = realpath(symlinkpath, actualpath);
-		printf("PTR: %s\n",symlinkpath);
+		sprintf(a,"%s/%s",ptr,curr_ent->d_name);
 
-		printf("%lu	%lu	%s	%07o	%lu	%d	%d	%lu	%s", curr_ent->d_ino, buf.st_blksize*buf.st_blocks/1000, ftype, buf.st_mode, buf.st_nlink, buf.st_uid, buf.st_gid, buf.st_size, s);
+		printf("%lu	%lu	%s	%s	%lu	%d	%d	%lu	%s", curr_ent->d_ino, buf.st_blksize*buf.st_blocks/1000, ftype, *mode1, buf.st_nlink, buf.st_uid, buf.st_gid, buf.st_size, s);
 
-		char temp [100];
-		char *ptr2 = realpath("./",temp);
-		if(ftype == "sy"){
-			printf("	%s/%s -> %s\n",ptr2,curr_ent->d_name, ptr);
+		if(ftype == "l"){
+			printf("	%s -> %s\n",a,*ptr);
 		}else if(is_dot_or_dot_dot(curr_ent->d_name)){
-			printf("	%s/%s\n",ptr2,curr_ent->d_name);
+			printf("	%s\n",a);
 		}else{
-			printf("	%s\n",ptr);
+			printf("	%s\n",a);
 		}
 
 		// Traverse sub-directories excluding . and ..
@@ -90,7 +97,6 @@ void listdir(char const* dirname)
 			strcat(subdir, curr_ent->d_name);
 
 			// List the contents of the subdirectory.
-			printf("SUB: %s\n",subdir);
 			listdir(subdir);
 
 			// Free the allocated memory.

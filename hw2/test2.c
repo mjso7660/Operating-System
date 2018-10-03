@@ -37,12 +37,12 @@ void listdir(char const* dirname)
 
 		char a[100], b[100];
 		char s[1000];
-		char *symlinkpath = strcat(a,b);
+		char const*symlinkpath = dirname;
 		char actualpath [100];
 		char *ptr;
 		ptr = realpath(symlinkpath, actualpath);
-		printf("%s\n",symlinkpath);
-		sprintf(s, "%s/%s",dirname,curr_ent->d_name);
+		//printf("%s\n",symlinkpath);
+		sprintf(s, "%s/%s",ptr,curr_ent->d_name);
 		
 		//char *file = strcat(a,b);
 		printf("%s\n",s);
